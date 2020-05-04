@@ -5,10 +5,6 @@ import MainSection from './MainSection/MainSection';
 import Footer from './Footer/Footer';
 
 
-
-
-
-
 function App() {
   return (
     <div className="App">
