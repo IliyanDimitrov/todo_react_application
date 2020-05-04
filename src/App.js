@@ -1,17 +1,16 @@
 import React from 'react';
 
-import TaskItem from './TaskItem/TaskItem';
+import NavBar from './NavBar/NavBar';
+import MainSection from './MainSection/MainSection';
+import Footer from './Footer/Footer';
+
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-          This is my header
-      </header>
-
-      <TaskItem />
-
-
+      <NavBar/>
+      <MainSection/>
+      <Footer/>
     </div>
   );
 }
