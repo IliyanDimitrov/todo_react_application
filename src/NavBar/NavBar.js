@@ -2,7 +2,7 @@ import React from 'react';
 
 import './NavBar.css';
 
-function NavBar(props) {
+function NavBar() {
     return (
         <header>
             <nav class="navbar navbar-expand-md navbar-light bg-light mb-3">
