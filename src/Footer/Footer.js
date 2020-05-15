@@ -4,8 +4,7 @@ import './Footer.css';
 
 function MainSection() {
     return (
-        <div className="container">
-            <hr/>
+        
             <footer>
             <div className="row">
                 <div className="col-md-6">
@@ -18,7 +17,7 @@ function MainSection() {
                 </div>
             </div>
         </footer>
-        </div>
+ 
     );
 }
 
