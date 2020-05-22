@@ -3,8 +3,9 @@ import React from 'react';
 import './ButtonItem.css';
 
 function ButtonItem(props) {
+
   return (
-    <button type="button" class="btn btn-primary" data-toggle="button" aria-pressed="false" autocomplete="off">
+    <button type="button" className="btn btn-primary" onClick={ props.handleDeleteClick } data-toggle="button" aria-pressed="false" autoComplete="off">
       {props.text}
     </button>
   );
