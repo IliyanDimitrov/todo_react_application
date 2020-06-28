@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
+import React, { useState, useEffect, Fragment } from 'react';
+import axios from 'axios';
 
 import NavBar from './NavBar/NavBar';
 import Footer from './Footer/Footer';
@@ -12,62 +12,96 @@ import "./App.css";
 
 function App() {
 
-  //const tasks = useState()[0];
-  //const setTasks = useState()[1];
+  const [tasks, setTasks] = useState();
 
-  //Destructuring method
+  useEffect(() => {
 
-  const [tasks, setTasks] = useState([
-    { text: "Task 1", completed: false, dueDate: "2020-05-16", completedDate: "", id: uuidv4() },
-    { text: "Task 2 Task 2", completed: false, dueDate: "2020-05-17", completedDate: "", id: uuidv4() },
-    { text: "Task 3 Task 3 Task 3", completed: true, dueDate: "2020-05-17", completedDate: "", id: uuidv4() },
-    { text: "Task 4 Task 4 Task 4 Task 4", completed: false, dueDate: "2020-05-17", completedDate: "", id: uuidv4() },
-    { text: "Task 5 Task 5 Task 5 Task 5 Task 5", completed: false, dueDate: "2020-05-18", completedDate: "", id: uuidv4() }
-  ]);
+   
+    //GET
+    axios
+      .get('https://qrxi205yi8.execute-api.eu-west-1.amazonaws.com/dev/tasks')
+      .then(
+        
+        response => {
+          console.log(response.data.tasks);
+          console.log("I am here");
 
-  const activeTasks = tasks.filter(task => !task.completed);
+          setTasks(response.data.tasks);
+        }
+      )
+      .catch(
+        (error) => {
+          console.log('Error fetching data', error)
+        }
+      )
+  }, []);
 
-  const completedTasks = tasks.filter(task => task.completed);
+  const activeTasks = tasks && tasks.filter(task => !task.completed);
 
-  const timeDifference = (currentDate, dueDate) => {
+  const completedTasks = tasks && tasks.filter(task => task.completed);
 
-    let taskTimeFrame = dueDate - currentDate;
+  const timeDifference = (currentDate, due_date) => {
+
+    let taskTimeFrame = due_date - currentDate;
 
     return Math.ceil(taskTimeFrame / (1000 * 60 * 60));
   };
 
+  
   const deleteTask = (id) => {
-    const updatedTaskList = tasks.filter(task => task.id !== id);
-    setTasks(updatedTaskList);
+    axios
+      .delete(`https://qrxi205yi8.execute-api.eu-west-1.amazonaws.com/dev/tasks/${id}`)
+      .then(response => {
+          const updatedTaskList = tasks.filter(task => task.task_id !== id);
+          setTasks(updatedTaskList);
+        })
+      .catch((error) => {
+        console.log('Error adding a task', error)
+      })
   }
-
+  
+  //PUT - Update task state
   const completeTask = (id) => {
-    const updatedTaskList = tasks.map(task => {
-      if (task.id === id) {
-        task.completed = true;
-      }
-      return task;
-    })
-    setTasks(updatedTaskList);
+    const updateTask = tasks.find(task => task.task_id === id);
+    updateTask.completed = 1;
+    
+    axios
+      .put(`https://qrxi205yi8.execute-api.eu-west-1.amazonaws.com/dev/tasks/${id}`, updateTask)
+      .then(response => {
+        const updatedTaskList = tasks.map(task => task.task_id === id ? updateTask : task)
+        setTasks(updatedTaskList);
+        })
+      .catch(error => {
+        console.log("Error fetching data", error);
+      })
   }
 
-  const addTask = (text, dueDate, completedDate) => {
+  //POST - Create new task
+  const addTask = (text, due_date) => {
     const newTask = {
-      text: text,
-      completed: false,
-      dueDate: dueDate,
-      completedDate: completedDate,
-      id: uuidv4()
+      "description": text,
+      "due_date": due_date,
+      "completed": 0,
+      "user_id": 1
     }
-    const updatedTaskList = [...tasks, newTask];
 
-    setTasks(updatedTaskList);
-  }
+    axios
+      .post('https://qrxi205yi8.execute-api.eu-west-1.amazonaws.com/dev/tasks', newTask)
+      .then(
+        (response) => {
+          newTask.task_id = response.data.task[0].task_id;
+          const updatedTasks = [...tasks, newTask]
+          setTasks(updatedTasks);
+        })
+      .catch((error) => {
+        console.log("Error adding a task", error);
+      });
+}
 
-  const clearInputFields = (text, dueDate) => {
-    text = "";
-    dueDate = "";
-  }
+const clearInputFields = (text, due_date) => {
+  text = "";
+  due_date = "";
+}
 
 
   return (
@@ -78,38 +112,44 @@ function App() {
         <div className="jumbotron">
           <h1 className="display-4">Add New Task</h1>
           <hr />
-          <InputField addTask={addTask} clearInputFields={clearInputFields}/>
+          <InputField addTask={addTask} clearInputFields={clearInputFields} />
+
         </div>
         <div className="row">
           <div className="col-md-12 col-lg-12 col-sm-12">
+            {tasks && (
+              <Fragment>
+                <RemainingTasks text="Active: " count={activeTasks.length} />
 
-            <RemainingTasks text="Active: " count={activeTasks.length} />
-            
-            <ul className="list-group">
-              {activeTasks.map(task =>
-                <TaskItem
-                  completeTask={completeTask}
-                  deleteTask={deleteTask}
-                  id={task.id}
-                  key={task.id}
-                  text={task.text}
-                  completed={task.completed}
-                  dueDate={timeDifference(Date.now(), new Date(task.dueDate))} />
-              )}
-            </ul>
+                <ul className="list-group">
+                  {activeTasks.map(task =>
+                    <TaskItem
+                      completeTask={completeTask}
+                      deleteTask={deleteTask}
+                      id={task.task_id}
+                      key={task.task_id}
+                      text={task.description}
+                      due_date={timeDifference(Date.now(), new Date(task.due_date))} />
+                  )}
+                </ul>
 
-            <br />
+                <br />
 
-            <ul className="list-group">
-              <RemainingTasks text="Completed: " count={completedTasks.length} />
-              {completedTasks.map(task =>
-                <TaskItem id={task.id}
-                  key={task.id}
-                  text={task.text}
-                  completed={task.completed}
-                  dueDate={task.dueDate} />
-              )}
-            </ul>
+                <ul className="list-group">
+                  <RemainingTasks text="Completed: " count={completedTasks.length} />
+                  {completedTasks.map(task =>
+                    <TaskItem
+                      deleteTask={deleteTask}
+                      id={task.task_id}
+                      key={task.task_id}
+                      text={task.description}
+                      due_date={task.due_date}
+                      completed={task.completed} 
+                      />
+                  )}
+                </ul>
+              </Fragment>
+            )}
           </div>
         </div>
         <hr />

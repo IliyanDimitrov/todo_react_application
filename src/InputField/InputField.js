@@ -5,7 +5,7 @@ import './InputField.css';
 function InputField(props) {
 
     const [text, setText] = useState();
-    const [dueDate, setDueDate] = useState();
+    const [due_date, setDueDate] = useState();
 
     const handleTextChange = (event) => {
         setText(event.target.value);
@@ -19,7 +19,7 @@ function InputField(props) {
     }
 
     const handleAaddTaskClick = () => {
-        props.addTask(text, dueDate);
+        props.addTask(text, due_date);
     }
 
     const handleClearTaskClick = () => {
@@ -42,7 +42,7 @@ function InputField(props) {
                     type="date"
                     className="form-control task-date"
                     onChange={handleDateChange}
-                    value={dueDate} />
+                    value={due_date} />
                 <div className="input-group-append">
                     <button className="btn btn-outline-secondary" type="button" onClick={handleAaddTaskClick}>Add</button>
                     <button className="btn btn-outline-secondary" type="button" onClick={handleClearTaskClick}>Clear</button>
