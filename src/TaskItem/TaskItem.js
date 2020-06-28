@@ -19,9 +19,9 @@ function TaskItem(props) {
       <span className="task__text">
         
         {!props.completed && <span className="task__date">{props.due_date}h</span>} 
-        {props.completed && <span className="task__completed">{props.due_date}</span>}
+        {props.completed && <span className="task__date">{props.due_date}</span>}
         { props.text }
-        
+
       </span>
       <div className="input-group-append">
       <span className="task__button--complete">

@@ -1,5 +1,5 @@
 .task__date {
-    padding: 2px;
+    margin-right: 0.5em;
     animation: fadeinout 5s linear infinite;
     opacity: 0;
     color: #007bff;
